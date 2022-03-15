@@ -1,0 +1,47 @@
+# import csv
+
+# maps = []
+
+# with open('CometLanding.csv', newline='') as csvfile:
+#     csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+#     for row in csvreader:
+#         # print(', '.join(row))
+#         print(row[0])
+
+# file = open('CometLanding.csv', 'r')
+# lines = file.readlines()
+# for i in range(21):
+#     print(lines[i])
+
+import pandas as pd
+import json
+
+df = pd.read_csv("CometLanding.csv",
+                 dtype={"id_str": str, "in_reply_to_user_id_str": str, "from_user_id_str": str,
+                        "in_reply_to_status_id_str": str, "user_followers_count": "Int64",
+                        "user_friends_count": "Int64", "geo_coordinates": str}, 
+                        parse_dates=['created_at']
+                 )
+
+df = df.drop(columns=['time'])
+
+df = df.drop_duplicates() # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.drop_duplicates.html
+
+# print(df.loc[0, 'created_at'])
+json_content = df['entities_str'].to_list()
+json_result = "["
+
+for j in json_content:
+    if isinstance(j, str):
+        json_result += j
+        if(j != json_content[len(json_content)-1]):
+            json_result += ", "
+       
+
+json_result += "]"
+
+writer = open('CometLandingFixed.json', 'w')
+writer.write(json_result)
+writer.close()
+
+# df.to_csv('CometLandingFixed.csv', index=False)
