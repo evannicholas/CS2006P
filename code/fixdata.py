@@ -1,17 +1,3 @@
-# import csv
-
-# maps = []
-
-# with open('CometLanding.csv', newline='') as csvfile:
-#     csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
-#     for row in csvreader:
-#         # print(', '.join(row))
-#         print(row[0])
-
-# file = open('CometLanding.csv', 'r')
-# lines = file.readlines()
-# for i in range(21):
-#     print(lines[i])
 
 import pandas as pd
 import json
