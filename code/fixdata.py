@@ -1,4 +1,7 @@
+#!/usr/bin/env python
+
 import pandas as pd
+import re
 import json
 import sys
 import os.path
@@ -81,10 +84,10 @@ def main(read):
 if __name__ == "__main__":
     if (len(sys.argv) != 2):
         usage()
-    elif (~(sys.argv[1].endswith(".csv"))):
-        print("File should be a CSV file!")
+    elif (not sys.argv[1].endswith(".csv")):
+        print("File should be a CSV file: " + sys.argv[1])
         usage()
-    elif (~(os.path.exists(default_path + sys.argv[1]))):
+    elif (not os.path.exists(default_path + sys.argv[1])):
         print("File does not exist: " + default_path + sys.argv[1])
         usage()
     else:
