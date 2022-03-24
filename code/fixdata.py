@@ -5,6 +5,8 @@ import re
 import json
 import sys
 import os.path
+from pytz import timezone
+import datetime
 
 default_path = "../data/"
 
@@ -21,8 +23,16 @@ def filter_data(df):
     # id_str(tweet id), from_user_id_str(user id), text, entities_str(hashtags)
     df.dropna(subset=['id_str', 'from_user_id_str', 'text', 'entities_str'], inplace=True)
 
-    # remove tweets without the hashtag "cometlanding" of any case
+    # remove tweets without "cometlanding" in the text and the hashtag used
     df.drop(df[~(df['entities_str'].str.contains("cometlanding", case=False))].index, inplace=True)
+
+    # filter tweets whose date is out of supposed range
+    start_date = datetime.datetime(2014,11,12)
+    start_date = timezone('GMT-0').localize(start_date)
+    end_date = datetime.datetime(2014,12,6)
+    end_date = timezone('GMT-0').localize(end_date)
+    df.drop(df[(pd.to_datetime(df['created_at'], utc=True) < start_date) 
+                | (pd.to_datetime(df['created_at'], utc=True) >= end_date)].index, inplace=True)
 
 
 def refine_id(df):
