@@ -13,7 +13,7 @@ from PIL import Image
 import datetime as dt
 
 default_path = "../data/"
-image_path = "../image/"
+image_path = "../images/"
 
 def createTweetsTypeChart(df):
     """Given a dataframe df, generate a chart showing the proportion of tweets, retweets and replies"""
