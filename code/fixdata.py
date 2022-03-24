@@ -75,7 +75,7 @@ def usage():
     print("Usage: ./fixdata.py <csv filename>")
 
 def main(read):
-    df = pd.read_csv(default_path + read,
+    df = pd.read_csv(read,
                  dtype={"id_str": str, "in_reply_to_user_id_str": str, "from_user_id_str": str,
                         "in_reply_to_status_id_str": str, "user_followers_count": "Int64",
                         "user_friends_count": "Int64", "geo_coordinates": str}, 
