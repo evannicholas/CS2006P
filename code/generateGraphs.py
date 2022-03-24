@@ -135,5 +135,5 @@ if __name__ == "__main__":
         print("File does not exist: " + default_path + sys.argv[1] + ".json")
         usage()
     else:
-        # main(default_path + sys.argv[1])
-        print(default_path + sys.argv[1])
+        main(default_path + sys.argv[1])
+        # print(default_path + sys.argv[1])
