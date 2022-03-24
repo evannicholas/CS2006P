@@ -38,8 +38,8 @@ def createTweetsTypeChart(df):
     # Put a nicer background color on the legend.
     legend.get_frame().set_facecolor('C0')
 
-    plt.tight_layout()
-    plt.savefig(image_path + "tweet_type.png")
+    # plt.tight_layout()
+    plt.savefig(image_path + "tweet_type.png", dpi=300, bbox_inches='tight')
     # plt.show()
 
 def getListOfAllHashTags(file):
