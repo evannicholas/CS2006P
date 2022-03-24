@@ -38,8 +38,9 @@ def createTweetsTypeChart(df):
     # Put a nicer background color on the legend.
     legend.get_frame().set_facecolor('C0')
 
+    plt.tight_layout()
     plt.savefig(image_path + "tweet_type.png")
-    plt.show()
+    # plt.show()
 
 def getListOfAllHashTags(file):
 	"""Given a json filepath, return a list of hashtags found from the file"""
@@ -134,5 +135,5 @@ if __name__ == "__main__":
         print("File does not exist: " + default_path + sys.argv[1] + ".json")
         usage()
     else:
-        # main(default_path + sys.argv[1])
-        print(default_path + sys.argv[1])
+        main(default_path + sys.argv[1])
+        # print(default_path + sys.argv[1])
