@@ -12,7 +12,8 @@ from wordcloud import WordCloud
 from PIL import Image
 import datetime as dt
 
-default_path = "../data"
+default_path = "../data/"
+image_path = "../image/"
 
 def createTweetsTypeChart(df):
     """Given a dataframe df, generate a chart showing the proportion of tweets, retweets and replies"""
@@ -37,7 +38,7 @@ def createTweetsTypeChart(df):
     # Put a nicer background color on the legend.
     legend.get_frame().set_facecolor('C0')
 
-    plt.savefig("tweet_type.png")
+    plt.savefig(image_path + "tweet_type.png")
     plt.show()
 
 def getListOfAllHashTags(file):
@@ -107,7 +108,7 @@ def createWordCloud(allHashtags):
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
     plt.show()
-    wordcloud.to_file('../wordCloud.png')
+    wordcloud.to_file(image_path + 'wordCloud.png')
 
 
 def main(read):
