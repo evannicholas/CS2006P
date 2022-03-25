@@ -41,6 +41,30 @@ def createTweetsTypeChart(df):
     # plt.tight_layout()
     plt.savefig(image_path + "tweet_type.png", dpi=300, bbox_inches='tight')
     # plt.show()
+    plt.clf()
+
+def createTimelinePlot(df):
+    """Given a dataframe df, generate chart showing the timeline of the tweets, one for the whole period
+    per day, another for the day with the most records per hour"""
+
+    # chart for day with most records 2014-11-12 per hour
+    date_raw = df[df['created_at'].apply(
+    lambda x: True if re.search('^2014-11-12', str(x)) else False)] # get dataframe with tweets on 2014-11-12
+    date = date_raw.set_index('created_at').groupby(pd.Grouper(freq='H'))
+
+    date_labels = [str(ts.strftime("%H"))
+               for ts in date.count()["id_str"].index.tolist()] # list of hours with records of tweets
+    date_data = date.count()["id_str"].tolist() # list of number of tweets for each recorded hour
+    
+    plt.title("CometLanding timeline 2014/11/12")
+    plt.xlabel("Hour")
+    plt.ylabel("Tweets")
+
+    plt.stem(date_labels, date_data)
+    plt.savefig(image_path + "tweet_timeline_2014_11_12.png", dpi=300, bbox_inches='tight')
+    # plt.show()
+    plt.clf()
+
 
 def getListOfAllHashTags(file):
 	"""Given a json filepath, return a list of hashtags found from the file"""
@@ -120,6 +144,7 @@ def main(read):
                         parse_dates=['created_at']
                  )
     createTweetsTypeChart(df)
+    createTimelinePlot(df)
     createWordCloud(getListOfAllHashTags(read + ".json"))
 
 def usage():
