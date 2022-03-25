@@ -49,8 +49,36 @@ def refine_id(df):
                 return r['id_str']
         else:
             return r['id_str']
-
+    
     df['id_str'] = df.apply(id_from_row, axis=1)
+ 
+
+def create_application_columns(df):
+    # https://pynative.com/python-regex-capturing-groups/
+    def regex_cleanup(row):
+        target_string = row['source']
+        pattern = re.compile(r"<.*>(.*)</.*>")
+        for match in pattern.finditer(target_string):
+            
+            return match.group(1)
+    
+    df['specific_applications'] = df.apply(regex_cleanup, axis=1)
+    df['applications'] = df.apply(regex_cleanup, axis=1)
+
+def refine_application(df):
+    
+    def application_only(r):
+        app = r["applications"]
+        if pd.notnull(app):
+            if re.search("Twitter",app):
+                return app[0:7]
+            else: 
+                return r["applications"]
+        else: 
+                return r["applications"]
+    
+    df['applications'] = df.apply(application_only, axis=1)
+
 
 def createJson(df, file):
     """takes a dataframe df and filename file as parameter, generate a JSON file with given file for df"""
@@ -84,6 +112,8 @@ def main(read):
 
     filter_data(df)
     refine_id(df)
+    create_application_columns(df)
+    refine_application(df)
 
     fixfile = read[:-4] + "Fixed" # filename prefix of fixed data in csv and json
 
