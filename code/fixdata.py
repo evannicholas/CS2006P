@@ -75,7 +75,7 @@ def refine_application(df):
             else: 
                 return r["applications"]
         else: 
-                return r["applications"]
+            return r["applications"]
     
     df['applications'] = df.apply(application_only, axis=1)
 
