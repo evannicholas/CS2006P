@@ -12,7 +12,7 @@ from wordcloud import WordCloud
 from PIL import Image
 import datetime as dt
 
-default_path = "../data/"
+data_path = "../data/"
 image_path = "../images/"
 
 def createTweetsTypeChart(df):
@@ -38,14 +38,11 @@ def createTweetsTypeChart(df):
     # Put a nicer background color on the legend.
     legend.get_frame().set_facecolor('C0')
 
-    # plt.tight_layout()
     plt.savefig(image_path + "tweet_type.png", dpi=300, bbox_inches='tight')
-    # plt.show()
-    plt.clf()
 
-def createTimelinePlot(df):
-    """Given a dataframe df, generate chart showing the timeline of the tweets, one for the whole period
-    per day, another for the day with the most records per hour"""
+def createActiveDayTimelinePlot(df):
+    """Given a dataframe df, generate chart showing the timeline of the tweets
+    for the day with the most records per hour"""
 
     # chart for day with most records 2014-11-12 per hour
     date_raw = df[df['created_at'].apply(
@@ -62,9 +59,47 @@ def createTimelinePlot(df):
 
     plt.stem(date_labels, date_data)
     plt.savefig(image_path + "tweet_timeline_2014_11_12.png", dpi=300, bbox_inches='tight')
-    # plt.show()
-    plt.clf()
 
+def createApplicationChart(df):
+    """Given a dataframe df, generate chart showing the number of tweets for
+    each type of application used, where the top 6 most used ones will be 
+    shown distinctively and the rest will be classified as others."""
+
+    # count number of tweets for each app
+    app_raw = df.groupby(["applications"]).agg(["count"])["id_str"]
+    # sort the apps in descending order by their counter
+    app_sorted = app_raw.sort_values(by="count",ascending=False)
+
+    # get the counters for the top 6 most used apps
+    top6_app = app_sorted.head(6)["count"]
+    # get the total of counters for the rest of the apps
+    others_count_app = app_sorted.sum() - app_sorted.head(6).sum()
+    others_dict_app = {"Others": others_count_app[0]}
+    others_app = pd.Series(data=others_dict_app)
+    top7_app = pd.concat([top6_app, others_app])
+
+    label = top7_app.keys().tolist() # app name as labels for chart
+    data = top7_app.values.tolist() # number of tweets corr. to each app
+
+    plt.rcdefaults()
+    fig, ax = plt.subplots()
+
+    y_pos = label
+    ax.barh(y_pos, data, align='center')
+    ax.set_yticks(y_pos, labels=label)
+    ax.invert_yaxis()  
+    ax.set_xlabel('Usage')
+    ax.set_title('Top 7 applications')
+
+    total = df["applications"].size # total number of tweets
+
+    # Calculate the usage percentage for each app
+    for p in ax.patches:
+        percentage = '{:.1f}%'.format(100 * p.get_width() / total)
+        x, y = p.get_xy() 
+        ax.annotate(percentage, (x, y + p.get_height() * 1.02), ha='right')
+
+    plt.savefig(image_path + "top_applications.png", dpi=300, bbox_inches='tight')
 
 def getListOfAllHashTags(file):
 	"""Given a json filepath, return a list of hashtags found from the file"""
@@ -144,7 +179,11 @@ def main(read):
                         parse_dates=['created_at']
                  )
     createTweetsTypeChart(df)
-    createTimelinePlot(df)
+    plt.clf()
+    createActiveDayTimelinePlot(df)
+    plt.clf()
+    createApplicationChart(df)
+    plt.clf()
     createWordCloud(getListOfAllHashTags(read + ".json"))
 
 def usage():
@@ -153,12 +192,12 @@ def usage():
 if __name__ == "__main__":
     if (len(sys.argv) != 2):
         usage()
-    elif (not os.path.exists(default_path + sys.argv[1] + ".csv")):
-        print("File does not exist: " + default_path + sys.argv[1] + ".csv")
+    elif (not os.path.exists(data_path + sys.argv[1] + ".csv")):
+        print("File does not exist: " + data_path + sys.argv[1] + ".csv")
         usage()
-    elif (not os.path.exists(default_path + sys.argv[1] + ".json")):
-        print("File does not exist: " + default_path + sys.argv[1] + ".json")
+    elif (not os.path.exists(data_path + sys.argv[1] + ".json")):
+        print("File does not exist: " + data_path + sys.argv[1] + ".json")
         usage()
     else:
-        main(default_path + sys.argv[1])
+        main(data_path + sys.argv[1])
         # print(default_path + sys.argv[1])

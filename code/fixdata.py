@@ -8,16 +8,13 @@ import os.path
 from pytz import timezone
 import datetime
 
-default_path = "../data/"
+data_path = "../data/"
 
 def filter_data(df):
     """takes a dataframe df as parameter, filters duplicated or inconsistent data and removes unwanted
     columns inplace"""
 
-    df.drop(columns=['time'], inplace=True) # remove time field as duplicated with created_at field
-
     df.drop_duplicates(inplace=True) # remove duplicated data
-    # df.dropna(axis = 0, how = 'all') # drop row if all fields are NaN
 
     # remove if any of the following fields is NaN:
     # id_str(tweet id), from_user_id_str(user id), text, entities_str(hashtags)
@@ -109,7 +106,8 @@ def main(read):
                         "user_friends_count": "Int64", "geo_coordinates": str}, 
                         parse_dates=['created_at']
                  )
-
+    df.drop(columns=['time'], inplace=True) # remove time field as duplicated with created_at field
+    
     filter_data(df)
     refine_id(df)
     create_application_columns(df)
@@ -127,8 +125,8 @@ if __name__ == "__main__":
     elif (not sys.argv[1].endswith(".csv")):
         print("File should be a CSV file: " + sys.argv[1])
         usage()
-    elif (not os.path.exists(default_path + sys.argv[1])):
-        print("File does not exist: " + default_path + sys.argv[1])
+    elif (not os.path.exists(data_path + sys.argv[1])):
+        print("File does not exist: " + data_path + sys.argv[1])
         usage()
     else:
-        main(default_path + sys.argv[1])
+        main(data_path + sys.argv[1])
