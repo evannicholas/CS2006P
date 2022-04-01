@@ -167,7 +167,6 @@ def createWordCloud(allHashtags):
     # Display the generated image:
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
-    plt.show()
     wordcloud.to_file(image_path + 'wordCloud.png')
 
 
