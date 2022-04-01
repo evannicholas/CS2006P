@@ -149,7 +149,7 @@ def printData(hashtagDataFrame):
 
 def createWordCloud(allHashtags):
     """Given a list of hashtags allHashtags, generate a corresponding wordcloud"""
-    mask = np.array(Image.open('../moon.jpg'))
+    mask = np.array(Image.open('../data/mask.jpg'))
     text = " ".join(x.split()[0] for x in allHashtags)
     # Create and generate a word cloud image:
     wordcloud = WordCloud(width = 12000,
