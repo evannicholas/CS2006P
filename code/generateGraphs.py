@@ -38,8 +38,6 @@ def createTweetsTypeChart(df):
     # Put a nicer background color on the legend.
     legend.get_frame().set_facecolor('C0')
 
-    plt.savefig(image_path + "tweet_type.png", dpi=300, bbox_inches='tight')
-
 def createActiveDayTimelinePlot(df):
     """Given a dataframe df, generate chart showing the timeline of the tweets
     for the day with the most records per hour"""
@@ -58,7 +56,6 @@ def createActiveDayTimelinePlot(df):
     plt.ylabel("Tweets")
 
     plt.stem(date_labels, date_data)
-    plt.savefig(image_path + "tweet_timeline_2014_11_12.png", dpi=300, bbox_inches='tight')
 
 def createApplicationChart(df):
     """Given a dataframe df, generate chart showing the number of tweets for
@@ -98,8 +95,6 @@ def createApplicationChart(df):
         percentage = '{:.1f}%'.format(100 * p.get_width() / total)
         x, y = p.get_xy() 
         ax.annotate(percentage, (x, y + p.get_height() * 1.02), ha='right')
-
-    plt.savefig(image_path + "top_applications.png", dpi=300, bbox_inches='tight')
 
 def getListOfAllHashTags(file):
 	"""Given a json filepath, return a list of hashtags found from the file"""
@@ -154,7 +149,7 @@ def printData(hashtagDataFrame):
 
 def createWordCloud(allHashtags):
     """Given a list of hashtags allHashtags, generate a corresponding wordcloud"""
-    mask = np.array(Image.open('../moon.jpg'))
+    mask = np.array(Image.open('../data/mask.jpg'))
     text = " ".join(x.split()[0] for x in allHashtags)
     # Create and generate a word cloud image:
     wordcloud = WordCloud(width = 12000,
@@ -167,7 +162,7 @@ def createWordCloud(allHashtags):
     # Display the generated image:
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
-    wordcloud.to_file(image_path + 'wordCloud.png')
+    return wordcloud
 
 
 def main(read):
@@ -178,12 +173,20 @@ def main(read):
                         parse_dates=['created_at']
                  )
     createTweetsTypeChart(df)
+    plt.savefig(image_path + "tweet_type.png", dpi=300, bbox_inches='tight')
     plt.clf()
+
     createActiveDayTimelinePlot(df)
+    plt.savefig(image_path + "tweet_timeline_2014_11_12.png", dpi=300, bbox_inches='tight')
     plt.clf()
+
     createApplicationChart(df)
+    plt.savefig(image_path + "top_applications.png", dpi=300, bbox_inches='tight')
     plt.clf()
-    createWordCloud(getListOfAllHashTags(read + ".json"))
+
+    wc = createWordCloud(getListOfAllHashTags(read + ".json"))
+    wc.to_file(image_path + 'wordCloud.png')
+    plt.clf()
 
 def usage():
     print("Usage: ./generateGraphs <file prefix>")
