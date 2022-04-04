@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from PIL import Image
 import datetime as dt
+import networkx as nx
+from matplotlib import pylab
 
 data_path = "../data/"
 image_path = "../images/"
@@ -67,6 +69,8 @@ def createActiveDayTimelinePlot(df):
     date_labels = [str(ts.strftime("%H"))
                for ts in date.count()["id_str"].index.tolist()] # list of hours with records of tweets
     date_data = date.count()["id_str"].tolist() # list of number of tweets for each recorded hour
+
+    plt.rcParams["figure.figsize"] = (5,5)
     
     plt.title("CometLanding timeline 2014/11/12")
     plt.xlabel("Hour")
@@ -181,6 +185,117 @@ def createWordCloud(allHashtags):
     plt.axis("off")
     return wordcloud
 
+def createReplyNetworkGraph(df):
+    """creates a network graph for replies, showing the linkage between the sender and the user being
+    replied"""
+
+    replies_network = nx.Graph() # initialize network graph
+    seenNodes_replies = set() # set of users involved in replies
+
+    total_replies = df[pd.notna(df['in_reply_to_user_id_str'])] # dataframe with replies only
+
+    for index, row in total_replies.iterrows(): # iterate each reply tweet
+
+        node_1 = row['in_reply_to_screen_name'] # create node for username of replied user
+
+        # add replied user node to network if not already exists and node is not null
+        if node_1 not in seenNodes_replies and node_1 is not None:
+            replies_network.add_node(node_1)
+            seenNodes_replies.add(node_1) # update set of exisitng users in network
+            
+        node_2 = row['from_user'] # create node for username of the sender
+
+        # add sender node to network if not already exists and node is not null
+        if node_2 not in seenNodes_replies and node_2 is not None :
+            replies_network.add_node(node_2)
+            seenNodes_replies.add(node_2) # update set of exisitng users in network
+            
+        replies_network.add_edge(node_1,node_2) # add edge between sender and replied user to show linkage
+        
+        # print(row['in_reply_to_screen_name'], row['from_user'])
+
+def createRetweetNetworkGraph(df):
+    """creates a network graph for retweets, showing the linkage between tweet sender and the sender
+    of the retweeted tweet"""
+
+    retweet_network = nx.Graph() # initialize graph
+    seenNodes_retweet = set() # set of users involved in retweets
+    # retweet_list = retweet_only_df['text'].apply(lambda x: x.split(":")[0][2:]) # slice and split to get retweet users
+
+    non_reply = df[pd.isna(df['in_reply_to_user_id_str'])] # dataframe without replies
+    retweet_only = non_reply[non_reply['text'].apply(lambda x: True if re.search("^RT @.*",x) else False)] # dataframe with retweets only
+
+    for index, row in retweet_only.iterrows(): # for each retweet
+
+        node_1 = row["from_user"] # create node for sender
+
+        # add sender node to network if not already exists and node is not null
+        if node_1 not in seenNodes_retweet and node_1 is not None:
+            retweet_network.add_node(node_1)
+            seenNodes_retweet.add(node_1) # update set of exisitng users in network
+            
+        node_2 = row["text"].split(":")[0][2:] # create node for sender of retweeted tweet
+        
+        # add retweeted tweet sender node to network if not already exists and node is not null
+        if node_2 not in seenNodes_retweet and node_2 is not None:
+            retweet_network.add_node(node_2)
+            seenNodes_retweet.add(node_2) # update set of exisitng users in network
+        
+        # add edge between sender and retweeted tweet sender to show linkage
+        retweet_network.add_edge(node_1,node_2) 
+
+def createMentionNetworkGraph(df):
+    """creates a network graph for mentions, showing the linkage between tweet sender and the other
+    mentioned users"""
+
+    mentions_network = nx.Graph() # initialize graph
+    seenNodes_mentions = set() # set of users that are senders or mentioned in tweets
+
+    for index, row in df.iterrows(): # for each tweet
+        
+        node_1 = row["from_user"] # create node for sender
+
+        # add sender to network if not already exists and node is not null
+        if node_1 not in seenNodes_mentions and node_1 is not None:
+            mentions_network.add_node(node_1)
+            seenNodes_mentions.add(node_1) # update set of exisitng users in network
+            
+        node_2 = row["text"] # create node for the text of tweet
+        match = re.search("@[A-Za-z0-9_]* ", node_2) # match whether there is a mentioned user
+
+        if match: # if there is mentioned user
+            # add mentioned user as a node to netowkr if not already exists and node is not null
+            if match.group() not in seenNodes_mentions and match.group() is not None:
+                mentions_network.add_node(match.group())
+                seenNodes_mentions.add(match.group()) # update set of exisitng users in network
+            
+            if match.group() == "@EUCouncil":
+                print(match.group())
+            
+            # add edge between sender and mentioned user to show linkage
+            mentions_network.add_edge(node_1,match.group()) 
+
+# https://stackoverflow.com/questions/17381006/large-graph-visualization-with-python-and-networkx
+def save_networkgraph(graph,file_name):
+    """Given a network graph and a filename, save the network graph with the given filename"""
+    #initialze Figure
+    plt.figure(num=None, figsize=(800,800), dpi=80)
+    plt.axis('off')
+    fig = plt.figure(1)
+    pos = nx.spring_layout(graph)
+    nx.draw_networkx_nodes(graph,pos)
+    nx.draw_networkx_edges(graph,pos, edge_color="r")
+    nx.draw_networkx_labels(graph,pos)
+
+    cut = 1.00
+    xmax = cut * max(xx for xx, yy in pos.values())
+    ymax = cut * max(yy for xx, yy in pos.values())
+    plt.xlim(-1*xmax, xmax)
+    plt.ylim(-1*ymax, ymax)
+
+    plt.savefig(file_name)
+    pylab.close()
+    del fig
 
 def main(read):
     df = pd.read_csv(read + ".csv",
