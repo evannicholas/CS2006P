@@ -11,8 +11,7 @@ import datetime
 data_path = "../data/"
 
 def filter_data(df):
-    """takes a dataframe df as parameter, filters duplicated or inconsistent data and removes unwanted
-    columns inplace"""
+    """filters duplicated or inconsistent data inplace"""
 
     df.drop_duplicates(inplace=True) # remove duplicated data
 
@@ -33,7 +32,7 @@ def filter_data(df):
 
 
 def refine_id(df):
-    """takes a dataframe df as parameter, refines the id_str field with the status_url field inplace"""
+    """refines the id_str field with the status_url field inplace"""
 
     def id_from_row(r):
         """takes a row of dataframe r as parameter, returns the id read from the status_url field,
@@ -51,6 +50,9 @@ def refine_id(df):
  
 
 def create_application_columns(df):
+    """creates a new column 'application' based on the 'source' field, where the new field 
+    value is the page title """
+
     # https://pynative.com/python-regex-capturing-groups/
     def regex_cleanup(row):
         target_string = row['source']
@@ -63,6 +65,7 @@ def create_application_columns(df):
     df['applications'] = df.apply(regex_cleanup, axis=1)
 
 def refine_application(df):
+    """refines the application field by making the identified application device non-specific"""
     
     def application_only(r):
         app = r["applications"]

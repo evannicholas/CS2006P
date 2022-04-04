@@ -38,11 +38,28 @@ def createTweetsTypeChart(df):
     # Put a nicer background color on the legend.
     legend.get_frame().set_facecolor('C0')
 
+def createDailyTimelinePlot(df):
+    # create new dataframe with creation date as index and grouped with the date
+    days = df.set_index('created_at').groupby(pd.Grouper(freq='D'))
+
+    # list of days with records of tweets
+    day_labels = [str(ts.strftime("%d/%m"))
+               for ts in days.count()["id_str"].index.tolist()]
+    # list of number of tweets for each recorded date
+    day_data = days.count()["id_str"].tolist()
+
+    plt.rcParams["figure.figsize"] = (20, 30)
+
+    plt.title("CometLanding timeline")
+    plt.xlabel("Date")
+    plt.ylabel("Number of tweets")
+
+    plt.plot(day_labels, day_data)
+
 def createActiveDayTimelinePlot(df):
     """Given a dataframe df, generate chart showing the timeline of the tweets
     for the day with the most records per hour"""
 
-    # chart for day with most records 2014-11-12 per hour
     date_raw = df[df['created_at'].apply(
     lambda x: True if re.search('^2014-11-12', str(x)) else False)] # get dataframe with tweets on 2014-11-12
     date = date_raw.set_index('created_at').groupby(pd.Grouper(freq='H'))
@@ -174,6 +191,10 @@ def main(read):
                  )
     createTweetsTypeChart(df)
     plt.savefig(image_path + "tweet_type.png", dpi=300, bbox_inches='tight')
+    plt.clf()
+
+    createDailyTimelinePlot(df)
+    plt.savefig(image_path + "tweet_timeline_daily.png", dpi=300, bbox_inches='tight')
     plt.clf()
 
     createActiveDayTimelinePlot(df)
