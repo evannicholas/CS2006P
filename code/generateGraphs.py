@@ -129,7 +129,8 @@ def getListOfAllHashTags(file):
 	# Gets list of hashtags from JSON file.
 	for j in json_load:
 		for i in j['hashtags']:
-			hashtagsFull.append(i['text'])
+			if(i['text'].lower() != "cometlanding"):
+				hashtagsFull.append(i['text'])
 	json_file.close()
 	return hashtagsFull
 
@@ -138,6 +139,12 @@ def getListOfUniqueHashtags(hashtagsFull):
 	# Gets unique hashtags.
 	hashtagsUnique = pd.Series(hashtagsFull)
 	hashtagsUnique = hashtagsUnique.unique()
+
+	for index, i in enumerate(hashtagsUnique):
+		if(i == "CometLanding"):
+			hashtagsUnique[index] = ""
+			break
+
 	return hashtagsUnique
 
 def createDataFrameOfHashtagsAndFills(hashtagsUnique, hashtagsFull):
@@ -155,7 +162,8 @@ def createDataFrameOfHashtagsAndFills(hashtagsUnique, hashtagsFull):
 
     # Sort values to descending.
     df = df.sort_values(['Frequency'], ascending=False)
-    return df
+    newdf = df[df['Frequency'] > 75]  
+    return newdf
 	
 def printData(hashtagDataFrame):	
 	"""Given a dataframe of hashtags, print the dataframe"""
@@ -185,8 +193,8 @@ def createWordCloud(allHashtags):
     plt.axis("off")
     return wordcloud
 
-def createReplyNetworkGraph(df):
-    """creates a network graph for replies, showing the linkage between the sender and the user being
+def createReplyNetwork(df):
+    """creates a network for replies, showing the linkage between the sender and the user being
     replied"""
 
     replies_network = nx.Graph() # initialize network graph
@@ -214,8 +222,8 @@ def createReplyNetworkGraph(df):
         
         # print(row['in_reply_to_screen_name'], row['from_user'])
 
-def createRetweetNetworkGraph(df):
-    """creates a network graph for retweets, showing the linkage between tweet sender and the sender
+def createRetweetNetwork(df):
+    """creates a network for retweets, showing the linkage between tweet sender and the sender
     of the retweeted tweet"""
 
     retweet_network = nx.Graph() # initialize graph
@@ -244,8 +252,8 @@ def createRetweetNetworkGraph(df):
         # add edge between sender and retweeted tweet sender to show linkage
         retweet_network.add_edge(node_1,node_2) 
 
-def createMentionNetworkGraph(df):
-    """creates a network graph for mentions, showing the linkage between tweet sender and the other
+def createMentionNetwork(df):
+    """creates a network for mentions, showing the linkage between tweet sender and the other
     mentioned users"""
 
     mentions_network = nx.Graph() # initialize graph
@@ -276,16 +284,16 @@ def createMentionNetworkGraph(df):
             mentions_network.add_edge(node_1,match.group()) 
 
 # https://stackoverflow.com/questions/17381006/large-graph-visualization-with-python-and-networkx
-def save_networkgraph(graph,file_name):
-    """Given a network graph and a filename, save the network graph with the given filename"""
+def save_networkgraph(network,file_name):
+    """Given a network and a filename, save the network graph with the given filename"""
     #initialze Figure
     plt.figure(num=None, figsize=(800,800), dpi=80)
     plt.axis('off')
     fig = plt.figure(1)
-    pos = nx.spring_layout(graph)
-    nx.draw_networkx_nodes(graph,pos)
-    nx.draw_networkx_edges(graph,pos, edge_color="r")
-    nx.draw_networkx_labels(graph,pos)
+    pos = nx.spring_layout(network)
+    nx.draw_networkx_nodes(network,pos)
+    nx.draw_networkx_edges(network,pos, edge_color="r")
+    nx.draw_networkx_labels(network,pos)
 
     cut = 1.00
     xmax = cut * max(xx for xx, yy in pos.values())
