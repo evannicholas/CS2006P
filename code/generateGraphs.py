@@ -20,16 +20,18 @@ image_path = "../images/"
 def createTweetsTypeChart(df):
     """Given a dataframe df, generate a chart showing the proportion of tweets, retweets and replies"""
     total_replies = df[pd.notna(df['in_reply_to_user_id_str'])] # dataframe with replies only
+    # dataframe with replies that are also retweet
+    retweet_reply = total_replies[total_replies['text'].apply(lambda x: True if re.search("^RT @.*",x) else False)]
     non_reply = df[pd.isna(df['in_reply_to_user_id_str'])] # dataframe without replies
     retweet_only = non_reply[non_reply['text'].apply(lambda x: True if re.search("^RT @.*",x) else False)] # dataframe with retweets only
     tweet_only = non_reply[non_reply['text'].apply(lambda x: False if re.search("^RT @.*",x) else True)] # dataframe with tweets only
 
-    x = [len(tweet_only),len(retweet_only),len(total_replies)]
+    x = [len(tweet_only),len(retweet_only),len(retweet_reply),len(total_replies) - len(retweet_reply)]
     colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
 
     # plot
     fig, ax = plt.subplots()
-    ax.pie(x, colors=colors, radius=2, center=(3, 3),labels=["Tweet", "Retweet", "Replies"],
+    ax.pie(x, colors=colors, radius=2, center=(3, 3),labels=["Tweet", "Retweet", "Reply that is Retweet", "Reply"],
         wedgeprops={"linewidth": 1, "edgecolor": "white"}, frame=False,
         autopct="%1.1f%%")
 
