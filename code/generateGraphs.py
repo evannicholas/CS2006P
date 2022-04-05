@@ -125,7 +125,8 @@ def getListOfAllHashTags(file):
 
 	# List of hashtags found
 	hashtagsFull = []
-
+	i = 0
+    
 	# Gets list of hashtags from JSON file.
 	for j in json_load:
 		for i in j['hashtags']:
