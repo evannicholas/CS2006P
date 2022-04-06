@@ -21,11 +21,10 @@ image_path = "../images/"
 def createTweetsTypeChart(df):
     """Given a dataframe df, generate a chart showing the proportion of tweets, retweets and replies"""
     total_replies = df[pd.notna(df['in_reply_to_user_id_str'])] # dataframe with replies only
-    # dataframe with replies that are also retweet
-    retweet_reply = total_replies[total_replies['text'].apply(lambda x: True if re.search("^RT @.*",x) else False)]
+    retweet_reply = total_replies[pd.notna(total_replies['retweet_user_id_str'])] # dataframe with replies that are also retweet
     non_reply = df[pd.isna(df['in_reply_to_user_id_str'])] # dataframe without replies
-    retweet_only = non_reply[non_reply['text'].apply(lambda x: True if re.search("^RT @.*",x) else False)] # dataframe with retweets only
-    tweet_only = non_reply[non_reply['text'].apply(lambda x: False if re.search("^RT @.*",x) else True)] # dataframe with tweets only
+    retweet_only = non_reply[pd.notna(non_reply['retweet_user_id_str'])] # dataframe with retweets only
+    tweet_only = non_reply[pd.isna(non_reply['retweet_user_id_str'])] # dataframe with tweets only
 
     x = [len(tweet_only),len(retweet_only),len(retweet_reply),len(total_replies) - len(retweet_reply)]
     colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
@@ -43,6 +42,8 @@ def createTweetsTypeChart(df):
     # Put a nicer background color on the legend.
     legend.get_frame().set_facecolor('C0')
 
+    plt.rcParams["figure.figsize"] = (5,5)
+
 def createDailyTimelinePlot(df):
     # create new dataframe with creation date as index and grouped with the date
     days = df.set_index('created_at').groupby(pd.Grouper(freq='D'))
@@ -56,7 +57,7 @@ def createDailyTimelinePlot(df):
     plt.rcParams["figure.figsize"] = (20, 30)
 
     plt.title("CometLanding timeline")
-    plt.xlabel("Date")
+    plt.xlabel("Date (dd-MM-2014)")
     plt.ylabel("Number of tweets")
 
     plt.plot(day_labels, day_data)
@@ -178,7 +179,7 @@ def createHashtagChart(file):
 
     hashtagData = pd.DataFrame({'Hashtags':hashtagData['Hashtags'], 'Frequency':hashtagData['Frequency']})
     plt.rcParams.update({'font.size': 8})
-    ax = hashtagData.plot.bar(x='Hashtags', y='Frequency', rot=0)
+    ax = hashtagData.plot.bar(x='Hashtags', y='Frequency', rot=0, figsize=(20,10))
 
     ax = sns.countplot(x="Hashtags", data=hashtagData)
 
@@ -242,12 +243,10 @@ def createRetweetNetwork(df):
 
     retweet_network = nx.Graph() # initialize graph
     seenNodes_retweet = set() # set of users involved in retweets
-    # retweet_list = retweet_only_df['text'].apply(lambda x: x.split(":")[0][2:]) # slice and split to get retweet users
 
-    non_reply = df[pd.isna(df['in_reply_to_user_id_str'])] # dataframe without replies
-    retweet_only = non_reply[non_reply['text'].apply(lambda x: True if re.search("^RT @.*",x) else False)] # dataframe with retweets only
+    retweet = df[pd.notna("retweet_user_id_str")] # dataframe with retweets only
 
-    for index, row in retweet_only.iterrows(): # for each retweet
+    for index, row in retweet.iterrows(): # for each retweet
 
         node_1 = row["from_user"] # create node for sender
 
@@ -256,7 +255,7 @@ def createRetweetNetwork(df):
             retweet_network.add_node(node_1)
             seenNodes_retweet.add(node_1) # update set of exisitng users in network
             
-        node_2 = row["text"].split(":")[0][2:] # create node for sender of retweeted tweet
+        node_2 = row["retweet_user_screen_name"] # create node for sender of retweeted tweet
         
         # add retweeted tweet sender node to network if not already exists and node is not null
         if node_2 not in seenNodes_retweet and node_2 is not None:
@@ -265,6 +264,7 @@ def createRetweetNetwork(df):
         
         # add edge between sender and retweeted tweet sender to show linkage
         retweet_network.add_edge(node_1,node_2) 
+        
     return retweet_network
 
 def createMentionNetwork(df):
@@ -283,20 +283,19 @@ def createMentionNetwork(df):
             mentions_network.add_node(node_1)
             seenNodes_mentions.add(node_1) # update set of exisitng users in network
             
-        node_2 = row["text"] # create node for the text of tweet
-        match = re.search("@[A-Za-z0-9_]* ", node_2) # match whether there is a mentioned user
+        mentions = json.loads(row['entities_str'])['user_mentions'] # get array of user_mentions
+        for men in mentions: # for each user mention
+            node_2 = men['screen_name'] # get the screen name
+            # if screen name is not null
+            if node_2 is not None:
+                # add mentioned user if not already in network
+                if node_2 not in seenNodes_mentions:
+                    mentions_network.add_node(node_2)
+                    seenNodes_mentions.add(node_2) # update set of exisitng users in network
 
-        if match: # if there is mentioned user
-            # add mentioned user as a node to netowkr if not already exists and node is not null
-            if match.group() not in seenNodes_mentions and match.group() is not None:
-                mentions_network.add_node(match.group())
-                seenNodes_mentions.add(match.group()) # update set of exisitng users in network
-            
-            if match.group() == "@EUCouncil":
-                print(match.group())
-            
-            # add edge between sender and mentioned user to show linkage
-            mentions_network.add_edge(node_1,match.group()) 
+                # add edge between sender and mentioned user to show linkage
+                mentions_network.add_edge(node_1, node_2) 
+
     return mentions_network
 
 # https://stackoverflow.com/questions/17381006/large-graph-visualization-with-python-and-networkx
@@ -317,6 +316,7 @@ def plotNetworkGraph(network):
     plt.xlim(-1*xmax, xmax)
     plt.ylim(-1*ymax, ymax)
 
+    return fig
     # pylab.close()
     # del fig
 
