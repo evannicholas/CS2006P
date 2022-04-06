@@ -81,7 +81,8 @@ def refine_application(df):
 
 
 def createJson(df, file):
-    """takes a dataframe df and filename file as parameter, generate a JSON file with given file for df"""
+    """takes a dataframe df and filename file as parameter, generate a JSON file with given file for 
+    entities_str field of df"""
 
     json_content = df['entities_str'].to_list()
     json_result = "["

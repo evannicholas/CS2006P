@@ -20,16 +20,18 @@ image_path = "../images/"
 def createTweetsTypeChart(df):
     """Given a dataframe df, generate a chart showing the proportion of tweets, retweets and replies"""
     total_replies = df[pd.notna(df['in_reply_to_user_id_str'])] # dataframe with replies only
+    # dataframe with replies that are also retweet
+    retweet_reply = total_replies[total_replies['text'].apply(lambda x: True if re.search("^RT @.*",x) else False)]
     non_reply = df[pd.isna(df['in_reply_to_user_id_str'])] # dataframe without replies
     retweet_only = non_reply[non_reply['text'].apply(lambda x: True if re.search("^RT @.*",x) else False)] # dataframe with retweets only
     tweet_only = non_reply[non_reply['text'].apply(lambda x: False if re.search("^RT @.*",x) else True)] # dataframe with tweets only
 
-    x = [len(tweet_only),len(retweet_only),len(total_replies)]
+    x = [len(tweet_only),len(retweet_only),len(retweet_reply),len(total_replies) - len(retweet_reply)]
     colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
 
     # plot
     fig, ax = plt.subplots()
-    ax.pie(x, colors=colors, radius=2, center=(3, 3),labels=["Tweet", "Retweet", "Replies"],
+    ax.pie(x, colors=colors, radius=2, center=(3, 3),labels=["Tweet", "Retweet", "Reply that is Retweet", "Reply"],
         wedgeprops={"linewidth": 1, "edgecolor": "white"}, frame=False,
         autopct="%1.1f%%")
 
@@ -226,6 +228,7 @@ def createReplyNetwork(df):
         replies_network.add_edge(node_1,node_2) # add edge between sender and replied user to show linkage
         
         # print(row['in_reply_to_screen_name'], row['from_user'])
+    return replies_network
 
 def createRetweetNetwork(df):
     """creates a network for retweets, showing the linkage between tweet sender and the sender
@@ -256,6 +259,7 @@ def createRetweetNetwork(df):
         
         # add edge between sender and retweeted tweet sender to show linkage
         retweet_network.add_edge(node_1,node_2) 
+    return retweet_network
 
 def createMentionNetwork(df):
     """creates a network for mentions, showing the linkage between tweet sender and the other
@@ -287,10 +291,11 @@ def createMentionNetwork(df):
             
             # add edge between sender and mentioned user to show linkage
             mentions_network.add_edge(node_1,match.group()) 
+    return mentions_network
 
 # https://stackoverflow.com/questions/17381006/large-graph-visualization-with-python-and-networkx
-def save_networkgraph(network,file_name):
-    """Given a network and a filename, save the network graph with the given filename"""
+def plotNetworkGraph(network):
+    """Given a network, plot the corresponding network graph"""
     #initialze Figure
     plt.figure(num=None, figsize=(800,800), dpi=80)
     plt.axis('off')
@@ -306,9 +311,8 @@ def save_networkgraph(network,file_name):
     plt.xlim(-1*xmax, xmax)
     plt.ylim(-1*ymax, ymax)
 
-    plt.savefig(file_name)
-    pylab.close()
-    del fig
+    # pylab.close()
+    # del fig
 
 def main(read):
     df = pd.read_csv(read + ".csv",
@@ -335,6 +339,18 @@ def main(read):
 
     wc = createWordCloud(getListOfAllHashTags(read + ".json"))
     wc.to_file(image_path + 'wordCloud.png')
+    plt.clf()
+
+    plotNetworkGraph(createReplyNetwork(df))
+    plt.savefig(image_path + "reply_network.pdf")
+    plt.clf()
+
+    plotNetworkGraph(createRetweetNetwork(df))
+    plt.savefig(image_path + "retweet_network.pdf")
+    plt.clf()
+    
+    plotNetworkGraph(createMentionNetwork(df))
+    plt.savefig(image_path + "mentions_network.pdf")
     plt.clf()
 
 def usage():
