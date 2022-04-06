@@ -243,7 +243,6 @@ def createRetweetNetwork(df):
 
     retweet_network = nx.Graph() # initialize graph
     seenNodes_retweet = set() # set of users involved in retweets
-    # retweet_list = retweet_only_df['text'].apply(lambda x: x.split(":")[0][2:]) # slice and split to get retweet users
 
     non_reply = df[pd.isna(df['in_reply_to_user_id_str'])] # dataframe without replies
     retweet_only = non_reply[non_reply['text'].apply(lambda x: True if re.search("^RT @.*",x) else False)] # dataframe with retweets only
@@ -284,20 +283,19 @@ def createMentionNetwork(df):
             mentions_network.add_node(node_1)
             seenNodes_mentions.add(node_1) # update set of exisitng users in network
             
-        node_2 = row["text"] # create node for the text of tweet
-        match = re.search("@[A-Za-z0-9_]* ", node_2) # match whether there is a mentioned user
+        mentions = json.loads(row['entities_str'])['user_mentions'] # get array of user_mentions
+        for men in mentions: # for each user mention
+            node_2 = men['screen_name'] # get the screen name
+            # if screen name is not null
+            if node_2 is not None:
+                # add mentioned user if not already in network
+                if node_2 not in seenNodes_mentions:
+                    mentions_network.add_node(node_2)
+                    seenNodes_mentions.add(node_2) # update set of exisitng users in network
 
-        if match: # if there is mentioned user
-            # add mentioned user as a node to netowkr if not already exists and node is not null
-            if match.group() not in seenNodes_mentions and match.group() is not None:
-                mentions_network.add_node(match.group())
-                seenNodes_mentions.add(match.group()) # update set of exisitng users in network
-            
-            if match.group() == "@EUCouncil":
-                print(match.group())
-            
-            # add edge between sender and mentioned user to show linkage
-            mentions_network.add_edge(node_1,match.group()) 
+                # add edge between sender and mentioned user to show linkage
+                mentions_network.add_edge(node_1, node_2) 
+
     return mentions_network
 
 # https://stackoverflow.com/questions/17381006/large-graph-visualization-with-python-and-networkx
@@ -318,6 +316,7 @@ def plotNetworkGraph(network):
     plt.xlim(-1*xmax, xmax)
     plt.ylim(-1*ymax, ymax)
 
+    return fig
     # pylab.close()
     # del fig
 
