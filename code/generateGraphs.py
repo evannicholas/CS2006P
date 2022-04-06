@@ -178,7 +178,7 @@ def createHashtagChart(file):
 
     hashtagData = pd.DataFrame({'Hashtags':hashtagData['Hashtags'], 'Frequency':hashtagData['Frequency']})
     plt.rcParams.update({'font.size': 8})
-    ax = hashtagData.plot.bar(x='Hashtags', y='Frequency', rot=0)
+    ax = hashtagData.plot.bar(x='Hashtags', y='Frequency', rot=0, figsize=(20,10))
 
     ax = sns.countplot(x="Hashtags", data=hashtagData)
 
