@@ -244,7 +244,7 @@ def createRetweetNetwork(df):
     retweet_network = nx.Graph() # initialize graph
     seenNodes_retweet = set() # set of users involved in retweets
 
-    retweet = df[pd.notna("retweet_user_id_str")] # dataframe with retweets only
+    retweet = df[pd.notna(df["retweet_user_id_str"])] # dataframe with retweets only
 
     for index, row in retweet.iterrows(): # for each retweet
 
@@ -302,7 +302,7 @@ def createMentionNetwork(df):
 def plotNetworkGraph(network):
     """Given a network, plot the corresponding network graph"""
     #initialze Figure
-    plt.figure(num=None, figsize=(800,800), dpi=50)
+    plt.figure(num=None, figsize=(800,800), dpi=80)
     plt.axis('off')
     fig = plt.figure(1)
     pos = nx.spring_layout(network)
@@ -351,17 +351,20 @@ def main(read):
     wc.to_file(image_path + 'wordCloud.png')
     plt.clf()
 
-    plotNetworkGraph(createReplyNetwork(df))
-    plt.savefig(image_path + "reply_network.pdf", dpi=300, bbox_inches='tight')
-    plt.clf()
+    fig = plotNetworkGraph(createReplyNetwork(df))
+    plt.savefig(image_path + "reply_network.pdf", bbox_inches='tight')
+    pylab.close()
+    del fig
 
-    # plotNetworkGraph(createRetweetNetwork(df))
-    # plt.savefig(image_path + "retweet_network.pdf", dpi=300, bbox_inches='tight')
-    # plt.clf()
+    fig = plotNetworkGraph(createRetweetNetwork(df))
+    plt.savefig(image_path + "retweet_network.pdf", bbox_inches='tight')
+    pylab.close()
+    del fig
     
-    # plotNetworkGraph(createMentionNetwork(df))
-    # plt.savefig(image_path + "mentions_network.pdf", dpi=300, bbox_inches='tight')
-    # plt.clf()
+    fig = plotNetworkGraph(createMentionNetwork(df))
+    plt.savefig(image_path + "mentions_network.pdf", bbox_inches='tight')
+    pylab.close()
+    del fig
 
 def usage():
     print("Usage: ./generateGraphs <file prefix>")
