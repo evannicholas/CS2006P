@@ -21,11 +21,10 @@ image_path = "../images/"
 def createTweetsTypeChart(df):
     """Given a dataframe df, generate a chart showing the proportion of tweets, retweets and replies"""
     total_replies = df[pd.notna(df['in_reply_to_user_id_str'])] # dataframe with replies only
-    # dataframe with replies that are also retweet
-    retweet_reply = total_replies[total_replies['text'].apply(lambda x: True if re.search("^RT @.*",x) else False)]
+    retweet_reply = total_replies[pd.notna(total_replies['retweet_user_id_str'])] # dataframe with replies that are also retweet
     non_reply = df[pd.isna(df['in_reply_to_user_id_str'])] # dataframe without replies
-    retweet_only = non_reply[non_reply['text'].apply(lambda x: True if re.search("^RT @.*",x) else False)] # dataframe with retweets only
-    tweet_only = non_reply[non_reply['text'].apply(lambda x: False if re.search("^RT @.*",x) else True)] # dataframe with tweets only
+    retweet_only = non_reply[pd.notna(non_reply['retweet_user_id_str'])] # dataframe with retweets only
+    tweet_only = non_reply[pd.isna(non_reply['retweet_user_id_str'])] # dataframe with tweets only
 
     x = [len(tweet_only),len(retweet_only),len(retweet_reply),len(total_replies) - len(retweet_reply)]
     colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
@@ -43,6 +42,8 @@ def createTweetsTypeChart(df):
     # Put a nicer background color on the legend.
     legend.get_frame().set_facecolor('C0')
 
+    plt.rcParams["figure.figsize"] = (5,5)
+
 def createDailyTimelinePlot(df):
     # create new dataframe with creation date as index and grouped with the date
     days = df.set_index('created_at').groupby(pd.Grouper(freq='D'))
@@ -56,7 +57,7 @@ def createDailyTimelinePlot(df):
     plt.rcParams["figure.figsize"] = (20, 30)
 
     plt.title("CometLanding timeline")
-    plt.xlabel("Date")
+    plt.xlabel("Date (dd-MM-2014)")
     plt.ylabel("Number of tweets")
 
     plt.plot(day_labels, day_data)
