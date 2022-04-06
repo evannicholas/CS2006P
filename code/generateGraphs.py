@@ -352,16 +352,16 @@ def main(read):
     plt.clf()
 
     plotNetworkGraph(createReplyNetwork(df))
-    plt.savefig(image_path + "reply_network.pdf")
+    plt.savefig(image_path + "reply_network.pdf", dpi=300, bbox_inches='tight')
     plt.clf()
 
-    plotNetworkGraph(createRetweetNetwork(df))
-    plt.savefig(image_path + "retweet_network.pdf")
-    plt.clf()
+    # plotNetworkGraph(createRetweetNetwork(df))
+    # plt.savefig(image_path + "retweet_network.pdf", dpi=300, bbox_inches='tight')
+    # plt.clf()
     
-    plotNetworkGraph(createMentionNetwork(df))
-    plt.savefig(image_path + "mentions_network.pdf")
-    plt.clf()
+    # plotNetworkGraph(createMentionNetwork(df))
+    # plt.savefig(image_path + "mentions_network.pdf", dpi=300, bbox_inches='tight')
+    # plt.clf()
 
 def usage():
     print("Usage: ./generateGraphs <file prefix>")
