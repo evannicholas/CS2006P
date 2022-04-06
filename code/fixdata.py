@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import pandas as pd
+import numpy as np
 import re
 import json
 import sys
@@ -64,6 +65,26 @@ def create_application_columns(df):
     df['specific_applications'] = df.apply(regex_cleanup, axis=1)
     df['applications'] = df.apply(regex_cleanup, axis=1)
 
+def create_retweet_columns(df):
+    """creates new columns for retweets, specifically for retweeted users"""
+    def isRetweet(row):
+        if re.search("^RT @.",row['text']):
+            return True
+        else:
+            return False
+
+    df['retweet_user_id_str'] = df.apply(
+        lambda x: json.loads(x["entities_str"])["user_mentions"][0]["id_str"] 
+        if isRetweet(x) else np.NaN, axis = 1)
+
+    df['retweet_user_screen_name'] = df.apply(
+        lambda x: json.loads(x["entities_str"])["user_mentions"][0]["screen_name"] 
+        if isRetweet(x) else np.NaN, axis = 1)
+    
+    df['retweet_user_name'] = df.apply(
+        lambda x: json.loads(x["entities_str"])["user_mentions"][0]["name"] 
+        if isRetweet(x) else np.NaN, axis = 1)
+
 def refine_application(df):
     """refines the application field by making the identified application device non-specific"""
     
@@ -116,6 +137,7 @@ def main(read):
     refine_id(df)
     create_application_columns(df)
     refine_application(df)
+    create_retweet_columns(df)
 
     fixfile = read[:-4] + "Fixed" # filename prefix of fixed data in csv and json
 
