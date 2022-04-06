@@ -352,7 +352,7 @@ def main(read):
     plt.clf()
 
     fig = plotNetworkGraph(createReplyNetwork(df))
-    plt.savefig(image_path + "reply_network.pdf", bbox_inches='tight')
+    plt.savefig(image_path + "replies_network.pdf", bbox_inches='tight')
     pylab.close()
     del fig
 
