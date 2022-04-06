@@ -244,10 +244,9 @@ def createRetweetNetwork(df):
     retweet_network = nx.Graph() # initialize graph
     seenNodes_retweet = set() # set of users involved in retweets
 
-    non_reply = df[pd.isna(df['in_reply_to_user_id_str'])] # dataframe without replies
-    retweet_only = non_reply[non_reply['text'].apply(lambda x: True if re.search("^RT @.*",x) else False)] # dataframe with retweets only
+    retweet = df[pd.notna("retweet_user_id_str")] # dataframe with retweets only
 
-    for index, row in retweet_only.iterrows(): # for each retweet
+    for index, row in retweet.iterrows(): # for each retweet
 
         node_1 = row["from_user"] # create node for sender
 
@@ -256,7 +255,7 @@ def createRetweetNetwork(df):
             retweet_network.add_node(node_1)
             seenNodes_retweet.add(node_1) # update set of exisitng users in network
             
-        node_2 = row["text"].split(":")[0][2:] # create node for sender of retweeted tweet
+        node_2 = row["retweet_user_screen_name"] # create node for sender of retweeted tweet
         
         # add retweeted tweet sender node to network if not already exists and node is not null
         if node_2 not in seenNodes_retweet and node_2 is not None:
@@ -265,6 +264,7 @@ def createRetweetNetwork(df):
         
         # add edge between sender and retweeted tweet sender to show linkage
         retweet_network.add_edge(node_1,node_2) 
+        
     return retweet_network
 
 def createMentionNetwork(df):
