@@ -13,6 +13,7 @@ from PIL import Image
 import datetime as dt
 import networkx as nx
 from matplotlib import pylab
+import seaborn as sns
 
 data_path = "../data/"
 image_path = "../images/"
@@ -167,6 +168,22 @@ def createDataFrameOfHashtagsAndFills(hashtagsUnique, hashtagsFull):
     df = df.sort_values(['Frequency'], ascending=False)
     newdf = df[df['Frequency'] > 75]  
     return newdf
+
+def createHashtagChart(file):
+    """creates a chart showing the hashtags used and the no. of times used based
+    on the given json file"""
+    allHashtags = getListOfAllHashTags(file)
+    uniqueHashtags = getListOfUniqueHashtags(allHashtags)
+    hashtagData = createDataFrameOfHashtagsAndFills(uniqueHashtags, allHashtags)
+
+    hashtagData = pd.DataFrame({'Hashtags':hashtagData['Hashtags'], 'Frequency':hashtagData['Frequency']})
+    plt.rcParams.update({'font.size': 8})
+    ax = hashtagData.plot.bar(x='Hashtags', y='Frequency', rot=0)
+
+    ax = sns.countplot(x="Hashtags", data=hashtagData)
+
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
+    plt.tight_layout()
 
 def createWordCloud(allHashtags):
     """Given a list of hashtags allHashtags, generate a corresponding wordcloud"""
@@ -324,6 +341,10 @@ def main(read):
 
     createApplicationChart(df)
     plt.savefig(image_path + "top_applications.png", dpi=300, bbox_inches='tight')
+    plt.clf()
+
+    createHashtagChart(read + ".json")
+    plt.savefig(image_path + "popular_hashtags.png", dpi=300, bbox_inches='tight')
     plt.clf()
 
     wc = createWordCloud(getListOfAllHashTags(read + ".json"))
