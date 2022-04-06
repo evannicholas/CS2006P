@@ -167,17 +167,6 @@ def createDataFrameOfHashtagsAndFills(hashtagsUnique, hashtagsFull):
     df = df.sort_values(['Frequency'], ascending=False)
     newdf = df[df['Frequency'] > 75]  
     return newdf
-	
-def printData(hashtagDataFrame):	
-	"""Given a dataframe of hashtags, print the dataframe"""
-	print(hashtagDataFrame)
-
-# Example usage 
-#allHashtags = getListOfAllHashTags()
-#uniqueHashtags = getListOfUniqueHashtags(allHashtags)
-#hashtagData = createDataFrameOfHashtagsAndFills(uniqueHashtags, allHashtags)
-#printData(hashtagData)
-
 
 def createWordCloud(allHashtags):
     """Given a list of hashtags allHashtags, generate a corresponding wordcloud"""
