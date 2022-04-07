@@ -330,40 +330,44 @@ def main(read):
     createTweetsTypeChart(df)
     plt.savefig(image_path + "tweet_type.png", dpi=300, bbox_inches='tight')
     plt.clf()
+    plt.close()
 
     createDailyTimelinePlot(df)
     plt.savefig(image_path + "tweet_timeline_daily.png", dpi=300, bbox_inches='tight')
     plt.clf()
+    plt.close()
 
     createActiveDayTimelinePlot(df)
     plt.savefig(image_path + "tweet_timeline_2014_11_12.png", dpi=300, bbox_inches='tight')
     plt.clf()
+    plt.close()
 
     createApplicationChart(df)
     plt.savefig(image_path + "top_applications.png", dpi=300, bbox_inches='tight')
     plt.clf()
+    plt.close()
 
-    createHashtagChart(read + ".json")
-    plt.savefig(image_path + "popular_hashtags.png", dpi=300, bbox_inches='tight')
-    plt.clf()
+    #createHashtagChart(read + ".json")
+    #plt.savefig(image_path + "popular_hashtags.png", dpi=300, bbox_inches='tight')
+    #plt.clf()
 
-    wc = createWordCloud(getListOfAllHashTags(read + ".json"))
-    wc.to_file(image_path + 'wordCloud.png')
-    plt.clf()
+    #wc = createWordCloud(getListOfAllHashTags(read + ".json"))
+    #wc.to_file(image_path + 'wordCloud.png')
+    #plt.clf()
 
     fig = plotNetworkGraph(createReplyNetwork(df))
     plt.savefig(image_path + "replies_network.pdf", bbox_inches='tight')
-    pylab.close()
+    plt.close()
     del fig
 
     fig = plotNetworkGraph(createRetweetNetwork(df))
     plt.savefig(image_path + "retweet_network.pdf", bbox_inches='tight')
-    pylab.close()
+    plt.close()
     del fig
     
     fig = plotNetworkGraph(createMentionNetwork(df))
     plt.savefig(image_path + "mentions_network.pdf", bbox_inches='tight')
-    pylab.close()
+    plt.close()
     del fig
 
 def usage():
