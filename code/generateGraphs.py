@@ -302,7 +302,7 @@ def createMentionNetwork(df):
 def plotNetworkGraph(network):
     """Given a network, plot the corresponding network graph"""
     #initialze Figure
-    plt.figure(num=None, figsize=(800,800), dpi=80)
+    plt.figure(num=None, figsize=(400,400), dpi=40)
     plt.axis('off')
     fig = plt.figure(1)
     pos = nx.spring_layout(network)
