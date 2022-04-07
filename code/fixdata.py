@@ -24,6 +24,10 @@ def filter_data(df):
     df.drop(df[~(df['entities_str'].str.contains("cometlanding", case=False))].index, inplace=True)
 
     # filter tweets whose date is out of supposed range
+    # method for comparing timezone-aware date learnt from:
+    # https://stackoverflow.com/questions/15307623/cant-compare-naive-and-aware-datetime-now-challenge-datetime-end
+    # posted by: Viren Rajput
+    # last accessed: 07/Apr/2022
     start_date = datetime.datetime(2014,11,12)
     start_date = timezone('GMT-0').localize(start_date)
     end_date = datetime.datetime(2014,12,6)
@@ -117,9 +121,13 @@ def createJson(df, file):
 
     json_result += "]"
 
-    writer = open(file + ".json", 'w')
-    writer.write(json_result)
-    writer.close()
+    with open(file + ".json", "w", encoding='utf-8') as writer:
+        writer.write(json_result)
+        writer.close()
+
+    #writer = open(file + ".json", 'w')
+    #writer.write(json_result)
+    #writer.close()
 
 def usage():
     print("Usage: ./fixdata.py <csv filename>")
