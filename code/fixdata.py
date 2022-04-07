@@ -127,10 +127,6 @@ def createJson(df, file):
         writer.write(json_result)
         writer.close()
 
-    #writer = open(file + ".json", 'w')
-    #writer.write(json_result)
-    #writer.close()
-
 def usage():
     print("Usage: ./fixdata.py <csv filename>")
 
