@@ -18,6 +18,12 @@ import seaborn as sns
 data_path = "../data/"
 image_path = "../images/"
 
+# method for adjusting figure size:
+# https://stackoverflow.com/questions/332289/how-do-you-change-the-size-of-figures-drawn-with-matplotlib
+# Posted by: Jouni K. Seppannen
+# last accessed: 04/Apr/2022
+# apply to all graphs below
+
 def createTweetsTypeChart(df):
     """Given a dataframe df, generate a chart showing the proportion of tweets, retweets and replies"""
     total_replies = df[pd.notna(df['in_reply_to_user_id_str'])] # dataframe with replies only
@@ -25,6 +31,12 @@ def createTweetsTypeChart(df):
     non_reply = df[pd.isna(df['in_reply_to_user_id_str'])] # dataframe without replies
     retweet_only = non_reply[pd.notna(non_reply['retweet_user_id_str'])] # dataframe with retweets only
     tweet_only = non_reply[pd.isna(non_reply['retweet_user_id_str'])] # dataframe with tweets only
+
+    # guidance for plotting pie chart:
+    # https://matplotlib.org/stable/gallery/pie_and_polar_charts/pie_and_donut_labels.html#sphx-glr-gallery-pie-and-polar-charts-pie-and-donut-labels-py
+    # https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.pie.html
+    # https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html
+    # last accessed: 07/Apr/2022
 
     x = [len(tweet_only),len(retweet_only),len(retweet_reply),len(total_replies) - len(retweet_reply)]
     colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
@@ -48,6 +60,19 @@ def createDailyTimelinePlot(df):
     # create new dataframe with creation date as index and grouped with the date
     days = df.set_index('created_at').groupby(pd.Grouper(freq='D'))
 
+    # guidance for plotting line chart:
+    # https://datatofish.com/line-chart-python-matplotlib/
+    # last accessed: 07/Apr/2022
+
+    # method to convert date to string in specific format learnt from:
+    # https://www.programiz.com/python-programming/datetime/strftime
+    # https://www.tutorialspoint.com/python/time_strftime.htm
+    # last accessed: 07/Apr/2022
+
+    # method to group by date learnt from:
+    # https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
+    # last accessed: 07/Apr/2022
+
     # list of days with records of tweets
     day_labels = [str(ts.strftime("%d/%m"))
                for ts in days.count()["id_str"].index.tolist()]
@@ -65,6 +90,15 @@ def createDailyTimelinePlot(df):
 def createActiveDayTimelinePlot(df):
     """Given a dataframe df, generate chart showing the timeline of the tweets
     for the day with the most records per hour"""
+
+    # method to convert date to string in specific format learnt from:
+    # https://www.programiz.com/python-programming/datetime/strftime
+    # https://www.tutorialspoint.com/python/time_strftime.htm
+    # last accessed: 07/Apr/2022
+
+    # method to group by date learnt from:
+    # https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
+    # last accessed: 07/Apr/2022
 
     date_raw = df[df['created_at'].apply(
     lambda x: True if re.search('^2014-11-12', str(x)) else False)] # get dataframe with tweets on 2014-11-12
@@ -207,6 +241,11 @@ def createWordCloud(allHashtags):
     plt.axis("off")
     return wordcloud
 
+# guidance for creating network graph:
+# https://networkx.org/documentation/stable/tutorial.html
+# last accessed: 07/Apr/2022
+# applied to createXXXNetwork(df)
+
 def createReplyNetwork(df):
     """creates a network for replies, showing the linkage between the sender and the user being
     replied"""
@@ -216,6 +255,10 @@ def createReplyNetwork(df):
 
     total_replies = df[pd.notna(df['in_reply_to_user_id_str'])] # dataframe with replies only
 
+    # method to iterate through rows of dataframe learnt from:
+    # https://stackoverflow.com/questions/16476924/how-to-iterate-over-rows-in-a-dataframe-in-pandas
+    # posted by: waitingkuo
+    # last accessed: 07/Apr/2022
     for index, row in total_replies.iterrows(): # iterate each reply tweet
 
         node_1 = row['in_reply_to_screen_name'] # create node for username of replied user
@@ -298,7 +341,10 @@ def createMentionNetwork(df):
 
     return mentions_network
 
+# Method for visualisation of network:
 # https://stackoverflow.com/questions/17381006/large-graph-visualization-with-python-and-networkx
+# posted by: Vikram
+# last accessed: 07/Apr/2022
 def plotNetworkGraph(network):
     """Given a network, plot the corresponding network graph"""
     #initialze Figure

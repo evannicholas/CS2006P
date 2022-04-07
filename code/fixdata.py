@@ -77,6 +77,8 @@ def create_retweet_columns(df):
         else:
             return False
 
+    # for retweet, the first user mention in entities_str must be the retweeted user
+
     df['retweet_user_id_str'] = df.apply(
         lambda x: json.loads(x["entities_str"])["user_mentions"][0]["id_str"] 
         if isRetweet(x) else np.NaN, axis = 1)
