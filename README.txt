@@ -36,6 +36,12 @@ INSTRUCTION
 The following(s) are the modules to be installed for running the scripts and notebook along with their
 installation command:
  	1. Wordcloud - pip install wordcloud
+	2. matplotlib 1.20.3 (optional) - pip install matplotlib 1.20.3
+Note: 2. is optional as the scripts can be run without this installation, more specifically this particular
+      version of matplotlib if matplotlib is already installed.  However, not installing this version may
+	  cause the graphs generated to have unexpected result such as missing headings with error.  During
+	  development this version seems to give rise to the least unexpected result, so it is highly 
+	  recommended to install this possibly older version.
 
 To perform the automated data cleaning and refining:
 1. move current directory to "code"
