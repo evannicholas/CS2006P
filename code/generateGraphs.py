@@ -347,13 +347,13 @@ def main(read):
     plt.clf()
     plt.close()
 
-    #createHashtagChart(read + ".json")
-    #plt.savefig(image_path + "popular_hashtags.png", dpi=300, bbox_inches='tight')
-    #plt.clf()
+    createHashtagChart(read + ".json")
+    plt.savefig(image_path + "popular_hashtags.png", dpi=300, bbox_inches='tight')
+    plt.clf()
 
-    #wc = createWordCloud(getListOfAllHashTags(read + ".json"))
-    #wc.to_file(image_path + 'wordCloud.png')
-    #plt.clf()
+    wc = createWordCloud(getListOfAllHashTags(read + ".json"))
+    wc.to_file(image_path + 'wordCloud.png')
+    plt.clf()
 
     fig = plotNetworkGraph(createReplyNetwork(df))
     plt.savefig(image_path + "replies_network.pdf", bbox_inches='tight')
