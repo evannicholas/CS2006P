@@ -58,7 +58,10 @@ def create_application_columns(df):
     """creates a new column 'application' based on the 'source' field, where the new field 
     value is the page title """
 
+    # detailed usage of regex learnt from:
     # https://pynative.com/python-regex-capturing-groups/
+    # last accessed: 07/Apr/2022
+
     def regex_cleanup(row):
         target_string = row['source']
         pattern = re.compile(r"<.*>(.*)</.*>")

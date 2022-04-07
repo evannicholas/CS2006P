@@ -157,6 +157,11 @@ def createApplicationChart(df):
 
 def getListOfAllHashTags(file):
 	"""Given a json filepath, return a list of hashtags found from the file"""
+
+    # Method for reading json file learnt from:
+    # https://www.geeksforgeeks.org/read-json-file-using-python/
+    # last accessed: 07/Apr/2022
+
 	# Open JSON file
 	with open(file, 'r', encoding="utf8") as json_file:
 		json_load = json.load(json_file)
@@ -222,6 +227,11 @@ def createHashtagChart(file):
 
 def createWordCloud(allHashtags):
     """Given a list of hashtags allHashtags, generate a corresponding wordcloud"""
+
+    # guidance for creating word cloud:
+    # https://towardsdatascience.com/how-to-create-beautiful-word-clouds-in-python-cfcf85141214
+    # last accessed: 07/Apr/2022
+
     mask = np.array(Image.open(data_path + 'mask.jpg'))
     text = ""
     for x in allHashtags:
