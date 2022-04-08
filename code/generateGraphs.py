@@ -3,16 +3,13 @@
 import pandas as pd
 import sys
 import os.path
-import math
 import json
 import re
 import numpy as np
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from PIL import Image
-import datetime as dt
 import networkx as nx
-from matplotlib import pylab
 import seaborn as sns
 
 data_path = "../data/"
