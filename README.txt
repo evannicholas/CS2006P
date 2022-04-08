@@ -31,12 +31,16 @@ notebooks
 Note: we use anaconda which supplies Jupyter notebook. Thus, most of the libraries are already installed, 
 such as matplotlib.
 
+
 INSTRUCTION
 
 The following(s) are the modules to be installed for running the scripts and notebook along with their
 installation command:
  	1. Wordcloud - pip install wordcloud
-	2. matplotlib 1.20.3 (optional) - pip install matplotlib 1.20.3
+	2. matplotlib - pip install matplotlib - ENSURE THIS VERSION IS 3.5.1
+	3. networkx - pip install networkx - ENSURE THIS VERSION IS 2.6.3
+	4. seaborn - pip install seaborn
+	5. pandas - pip install pandas
 Note: 2. is optional as the scripts can be run without this installation, more specifically this particular
       version of matplotlib if matplotlib is already installed.  However, not installing this version may
 	  cause the graphs generated to have unexpected result such as missing headings with error.  During
@@ -59,3 +63,4 @@ To generate graphs for data analysis based on the refined data:
 	network and mentions network which involves large amounts of edges and nodes.
 --> Please do NOT run any other scripts or notebooks when running generateGraphs.py, as this may cause the
     kernel to crash
+--> Use Google Chrome or Firefox.
