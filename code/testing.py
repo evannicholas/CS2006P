@@ -10,6 +10,8 @@ import datetime
 import generateGraphs as gg
 import fixdata as fd
 
+pd.options.mode.chained_assignment = None  # default='warn'
+
 def readCSV():
     df = pd.read_csv("../data/CometLandingFixed.csv",
             dtype={"id_str": str, "in_reply_to_user_id_str": str, "from_user_id_str": str,
