@@ -31,6 +31,7 @@ notebooks
 Note: we use anaconda which supplies Jupyter notebook. Thus, most of the libraries are already installed, 
 such as matplotlib.
 
+
 INSTRUCTION
 
 The following(s) are the modules to be installed for running the scripts and notebook along with their
@@ -62,3 +63,4 @@ To generate graphs for data analysis based on the refined data:
 	network and mentions network which involves large amounts of edges and nodes.
 --> Please do NOT run any other scripts or notebooks when running generateGraphs.py, as this may cause the
     kernel to crash
+--> Use Google Chrome or Firefox.
