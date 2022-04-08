@@ -7,6 +7,7 @@ code
 	- fixdata.py: filter duplicated or inconsistent data, refine data, add columns for further analysis
 	  and save processed data in "data" directory
 	- generateGraphs.py: create graphs for data analysis and save graphs in "images" directory
+	- testing.py: unit tests for functions in fixdata.py and generateGraphs.py
 
 data
 	This directory contains the data files used for analysis:
@@ -64,3 +65,8 @@ To generate graphs for data analysis based on the refined data:
 --> Please do NOT run any other scripts or notebooks when running generateGraphs.py, as this may cause the
     kernel to crash
 --> Use Google Chrome or Firefox.
+
+To run unit tests:
+1. move current directory to "code"
+2. run command: chmod 755 testing.py
+3. run command: ./testing.py
