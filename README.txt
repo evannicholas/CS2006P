@@ -37,8 +37,8 @@ INSTRUCTION
 The following(s) are the modules to be installed for running the scripts and notebook along with their
 installation command:
  	1. Wordcloud - pip install wordcloud
-	2. matplotlib 1.20.3 (optional) - pip install matplotlib==1.20.3
-	3. networkx - pip install networkx
+	2. matplotlib - pip install matplotlib - ENSURE THIS VERSION IS 3.5.1
+	3. networkx - pip install networkx - ENSURE THIS VERSION IS 2.6.3
 	4. seaborn - pip install seaborn
 	5. pandas - pip install pandas
 Note: 2. is optional as the scripts can be run without this installation, more specifically this particular
